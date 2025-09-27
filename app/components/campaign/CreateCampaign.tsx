@@ -9,7 +9,7 @@ export default function CreateCampaign() {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
 
   const [goal, setGoal] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState(""); // datetime-local
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -22,13 +22,23 @@ export default function CreateCampaign() {
     try {
       const tx = new Transaction();
 
+      // Calcular duración en milisegundos
+      const now = Date.now();
+      const target = new Date(deadline).getTime();
+      const durationMs = target - now;
+      if (durationMs <= 0) {
+        alert("⚠️ Deadline must be in the future");
+        return;
+      }
+
       tx.moveCall({
         target: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::create_campaign`,
         arguments: [
-          tx.pure.u64(goal),       // goal
-          tx.pure.u64(deadline),   // deadline
-          tx.pure.string(name),    // name
-          tx.pure.string(description), // description
+          tx.pure.u64(goal),             // 🎯 goal
+          tx.pure.u64(durationMs),       // ⏳ duration en milisegundos
+          tx.pure.string(name),          // 📝 name
+          tx.pure.string(description),   // 📝 description
+          tx.object("0x6"),              // ⏰ Clock object fijo
         ],
       });
 
@@ -61,7 +71,7 @@ export default function CreateCampaign() {
           {/* Goal */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Goal (SUI)
+              Goal (MIST)
             </label>
             <input
               type="number"
@@ -79,17 +89,12 @@ export default function CreateCampaign() {
             </label>
             <input
               type="datetime-local"
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value) {
-                  const ts = Math.floor(new Date(value).getTime() / 1000);
-                  setDeadline(ts.toString());
-                }
-              }}
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg bg-white text-gray-900"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Stored as UNIX timestamp: {deadline || "Not selected"}
+              Selected deadline: {deadline || "Not selected"}
             </p>
           </div>
 

@@ -36,19 +36,37 @@ export default function CampaignList() {
           key={c.id}
           className="border border-gray-300 rounded-xl p-6 shadow-md bg-white"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            📢 Campaign {c.id.slice(0, 6)}...  {/* ✅ show ID at top */}
+          {/* Title */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {c.name || "📢 Untitled Campaign"}
           </h2>
-          <p className="text-sm text-gray-500 mb-2">ID: {c.id}</p> {/* ✅ full ID */}
 
-          <p>🎯 Goal: {c.goal} SUI</p>
-          <p>📊 Raised: {c.totalRaised} SUI</p>
-          <p>📅 Deadline: {new Date(c.deadline * 1000).toLocaleString()}</p>
-          <p>👤 Owner: {c.owner}</p>
+          {/* Optional description */}
+          {c.description && (
+            <p className="text-gray-700 mb-3">{c.description}</p>
+          )}
 
-          {c.name && <p className="mt-2 font-semibold">📝 {c.name}</p>}
-          {c.description && <p className="text-gray-700">{c.description}</p>}
+          {/* ID */}
+          <p className="text-xs text-gray-500 mb-3">ID: {c.id}</p>
 
+          {/* Campaign info */}
+          <div className="space-y-1">
+            <p>🎯 Goal: <b>{c.goal} MIST</b></p>
+            <p>📊 Raised: <b>{c.totalRaised} MIST</b></p>
+            <p>📅 Deadline: <b>{new Date(Number(c.deadline)).toLocaleString()}</b></p>
+            <p>👤 Owner: {c.owner}</p>
+          </div>
+
+          {/* Status */}
+          <div className="mt-3">
+            {Date.now() > Number(c.deadline) ? (
+              <p className="text-red-600 font-semibold">⏰ Campaign ended</p>
+            ) : (
+              <p className="text-green-600 font-semibold">✅ Active</p>
+            )}
+          </div>
+
+          {/* Contribute button */}
           <Link href={`/contribute?id=${c.id}`}>
             <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg shadow">
               💸 Contribute
