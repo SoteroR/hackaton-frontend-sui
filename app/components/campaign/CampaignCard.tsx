@@ -1,46 +1,43 @@
 "use client";
 
-interface CampaignCardProps {
+type Campaign = {
   id: string;
-  goal: number;
-  raised: number;
-  deadline: number;
+  goal: string;
+  deadline: string;
+  totalRaised: string;
   owner: string;
-}
+};
 
-export default function CampaignCard({ id, goal, raised, deadline, owner }: CampaignCardProps) {
+export default function CampaignCard({ campaign }: { campaign: Campaign }) {
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col justify-between hover:shadow-lg transition">
-      {/* Title */}
-      <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-        🎯 Campaign <span className="text-gray-500 text-sm truncate">{id}</span>
-      </h3>
+    <div className="p-6 border rounded-lg shadow-md bg-white hover:shadow-lg transition">
+      <h2 className="text-lg font-bold text-gray-800 mb-2">
+        🎯 Campaign #{campaign.id.slice(0, 6)}...
+      </h2>
 
-      {/* Details */}
-      <div className="space-y-2 text-sm text-gray-700">
-        <p>
-          <span className="font-semibold">Goal:</span>{" "}
-          <span className="text-blue-600">{goal} SUI</span>
-        </p>
-        <p>
-          <span className="font-semibold">Raised:</span>{" "}
-          <span className="text-green-600">{raised} SUI</span>
-        </p>
-        <p>
-          <span className="font-semibold">Deadline:</span>{" "}
-          {new Date(Number(deadline) * 1000).toLocaleString()}
-        </p>
-        <p>
-          <span className="font-semibold">Owner:</span>{" "}
-          <span className="truncate">{owner}</span>
-        </p>
-      </div>
+      <p className="text-gray-700">
+        <b>Goal:</b> {campaign.goal} SUI
+      </p>
+      <p className="text-gray-700">
+        <b>Raised:</b> {campaign.totalRaised} SUI
+      </p>
+      <p className="text-gray-700">
+        <b>Deadline:</b>{" "}
+        {new Date(Number(campaign.deadline) * 1000).toLocaleString()}
+      </p>
+      <p className="text-gray-700">
+        <b>Owner:</b> {campaign.owner}
+      </p>
 
-      {/* Contribute Button */}
+      <p className="text-xs text-gray-500 break-words mt-2">
+        <b>ID:</b> {campaign.id}
+      </p>
+
       <button
-        className="mt-6 w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
-                   text-white font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm"
-        onClick={() => alert(`Contribute to ${id}`)}
+        onClick={() =>
+          (window.location.href = `/contribute?id=${campaign.id}`)
+        }
+        className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-md transition"
       >
         💸 Contribute
       </button>
