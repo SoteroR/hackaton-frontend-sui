@@ -11,7 +11,7 @@ export default function CreateCampaign() {
   const [deadline, setDeadline] = useState("");
 
   const handleCreate = async () => {
-    const tx = new Transaction(); // ✅ Use Transactions instead of TransactionBlock
+    const tx = new Transaction();
 
     tx.moveCall({
       target: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::create_campaign`,
@@ -19,7 +19,7 @@ export default function CreateCampaign() {
     });
 
     signAndExecute(
-      { transaction: tx }, // ✅ now the wallet understands
+      { transaction: tx },
       {
         onSuccess: (res) => {
           console.log("✅ Campaign created:", res);
