@@ -7,6 +7,7 @@ import { CreateCounter } from "./CreateCounter";
 import { CounterList } from "./components/CounterList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AutoCoinButton } from "@/autocoinbutton";
 
 function App() {
   const currentAccount = useCurrentAccount();
@@ -87,6 +88,7 @@ function App() {
                   >
                     Find Existing Counter
                   </Button>
+
                 </div>
 
                 {/* Content based on view */}
