@@ -1,2 +1,6 @@
-export const DEVNET_COUNTER_PACKAGE_ID = "0xTODO";
-export const TESTNET_COUNTER_PACKAGE_ID = "0xc04d66a8c3d124dccce6f2a9fcd89d648777bebdc7e3dbaf162cdc56af8d2651";
+export const DEVNET_COUNTER_PACKAGE_ID =
+  "0xTODO"; // replace if you deploy on Devnet
+export const TESTNET_COUNTER_PACKAGE_ID =
+  "0xac3d8910d8d446441fa0fc1863380776ebc68198b68ab4c3b8cb846417ed487d"; // ✅ your crowdfunding package ID
+export const MAINNET_COUNTER_PACKAGE_ID =
+  "0xTODO"; // leave placeholder if you don’t have mainnet deployment yet
