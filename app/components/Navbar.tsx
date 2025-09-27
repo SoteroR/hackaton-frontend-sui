@@ -77,6 +77,15 @@ export default function Navbar() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
+            <NavigationMenuLink asChild>
+              <Link href="/campaigns" className="text-gray-900">
+                Campaigns
+              </Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+
+
+          <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
               <Link href="/" className="text-gray-900">Home</Link>
             </NavigationMenuLink>
