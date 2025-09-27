@@ -5,25 +5,53 @@ import { TESTNET_COUNTER_PACKAGE_ID } from "../constants";
 
 const client = new SuiClient({ url: getFullnodeUrl("testnet") });
 
-export async function fetchAllCampaigns() {
+export type Campaign = {
+  id: string;
+  goal: number;
+  deadline: number;
+  owner: string;
+  totalRaised: number;
+  isActive: boolean;
+  name: string;
+  description: string;
+};
+
+export async function fetchAllCampaigns(): Promise<Campaign[]> {
   try {
-    // 🔎 leemos eventos emitidos por tu módulo
+    // 1️⃣ Read events to discover campaign IDs
     const response = await client.queryEvents({
       query: {
         MoveEventType: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::CampaignCreated`,
       },
     });
 
-    // 🔄 Mapear los datos del evento
-    const campaigns = response.data.map((evt: any) => {
+    // 2️⃣ For each campaign ID, fetch the full object
+    const campaigns: Campaign[] = [];
+    for (const evt of response.data) {
       const fields = evt.parsedJson;
-      return {
-        id: fields.campaign_id,
-        goal: Number(fields.goal),
-        deadline: Number(fields.deadline),
-        owner: fields.owner,
-      };
-    });
+      const id = fields.campaign_id as string;
+
+      const obj = await client.getObject({
+        id,
+        options: { showContent: true },
+      });
+
+      let objFields: any = {};
+      if (obj.data?.content?.dataType === "moveObject") {
+        objFields = (obj.data.content as any).fields;
+      }
+
+      campaigns.push({
+        id,
+        goal: Number(objFields.goal ?? fields.goal ?? 0),
+        deadline: Number(objFields.deadline ?? fields.deadline ?? 0),
+        owner: objFields.owner ?? fields.owner ?? "",
+        totalRaised: Number(objFields.total_raised ?? 0),
+        isActive: objFields.is_active ?? true,
+        name: objFields.name ?? "",
+        description: objFields.description ?? "",
+      });
+    }
 
     return campaigns;
   } catch (err) {

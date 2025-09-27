@@ -1,17 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchAllCampaigns } from "../../lib/fetchAllCampaigns";
+import { fetchAllCampaigns, Campaign } from "../../lib/fetchAllCampaigns";
 import Link from "next/link";
-
-type Campaign = {
-  id: string;
-  goal: number;
-  deadline: number;
-  totalRaised: number;
-  owner: string;
-  isActive: boolean;
-};
 
 export default function CampaignList() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -21,9 +12,9 @@ export default function CampaignList() {
     (async () => {
       try {
         const all = await fetchAllCampaigns();
-        setCampaigns(all);
+        setCampaigns(all || []);
       } catch (err) {
-        console.error("❌ Failed to fetch campaigns", err);
+        console.error("❌ Failed to fetch campaigns:", err);
       } finally {
         setLoading(false);
       }
@@ -31,33 +22,35 @@ export default function CampaignList() {
   }, []);
 
   if (loading) {
-    return <p className="text-gray-600">⏳ Loading campaigns...</p>;
+    return <p className="text-gray-600">Loading campaigns...</p>;
   }
 
   if (campaigns.length === 0) {
-    return <p className="text-gray-600">No campaigns found yet.</p>;
+    return <p className="text-gray-600">No campaigns found.</p>;
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="space-y-6">
       {campaigns.map((c) => (
         <div
           key={c.id}
-          className="p-4 border rounded-lg shadow bg-white flex flex-col gap-2"
+          className="border border-gray-300 rounded-xl p-6 shadow-md bg-white"
         >
-          <h2 className="text-lg font-bold text-gray-800">
-            📢 Campaign {c.id.slice(0, 6)}...
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            📢 Campaign {c.id.slice(0, 6)}...  {/* ✅ show ID at top */}
           </h2>
-          <p className="text-gray-800">🎯 Goal: {c.goal} SUI</p>
-          <p className="text-gray-800">📊 Raised: {c.totalRaised} SUI</p>
-          <p className="text-gray-800">
-            📅 Deadline: {new Date(Number(c.deadline) * 1000).toLocaleString()}
-          </p>
-          <p className="text-gray-800">👤 Owner: {c.owner.slice(0, 10)}...</p>
+          <p className="text-sm text-gray-500 mb-2">ID: {c.id}</p> {/* ✅ full ID */}
 
-          {/* ✅ Button with white text */}
+          <p>🎯 Goal: {c.goal} SUI</p>
+          <p>📊 Raised: {c.totalRaised} SUI</p>
+          <p>📅 Deadline: {new Date(c.deadline * 1000).toLocaleString()}</p>
+          <p>👤 Owner: {c.owner}</p>
+
+          {c.name && <p className="mt-2 font-semibold">📝 {c.name}</p>}
+          {c.description && <p className="text-gray-700">{c.description}</p>}
+
           <Link href={`/contribute?id=${c.id}`}>
-            <button className="mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition">
+            <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg shadow">
               💸 Contribute
             </button>
           </Link>
