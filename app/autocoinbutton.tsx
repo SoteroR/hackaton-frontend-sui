@@ -6,9 +6,9 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
-export function AutoCoinButton({ amount }: { amount: bigint }) {
+import { TESTNET_COUNTER_PACKAGE_ID } from "@/constants";
+export function AutoCoinButton( { amount, id }: { amount: bigint , id: string } ) {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
 
   const currentAccount = useCurrentAccount()?.address;
   const { mutate: signAndExecute } = useSignAndExecuteTransaction({
@@ -48,19 +48,22 @@ export function AutoCoinButton({ amount }: { amount: bigint }) {
         tx.mergeCoins(tx.gas, coinList.slice(1));
       }
 
-      const splitCoin = tx.splitCoins(tx.gas, [amount]);
-      tx.transferObjects([splitCoin], currentAccount);
+      const [splitCoin] = tx.splitCoins(tx.gas, [amount]);
+      tx.moveCall({
+        target: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::contribute`,
+        arguments: [
+          tx.object(id),  // &mut Campaign
+          splitCoin                    // Coin<SUI>
+          // TxContext is automatic
+        ],
+      });
 
-      let dc: string | undefined;
       signAndExecute(
         { transaction: tx },
         {
           onSuccess: (res) => {
-            dc = res.objectChanges?.find(
-              (item) => item.type === "created",
-            )?.objectId;
-            if (!dc) console.log("Error creating object");
-            setResult(dc ?? "Error");
+            console.log("diavlo");
+            console.log(res);
           },
         },
       );
@@ -72,9 +75,8 @@ export function AutoCoinButton({ amount }: { amount: bigint }) {
   };
 
   return (
-    <Button onClick={handleClick} disabled={loading}>
-      {loading ? "Processing..." : `AutoCoin ${amount.toString()}`}
-      {result && <div>Result: {result}</div>}
+    <Button onClick={handleClick} disabled={loading} style={{ color: "black" }}>
+      {loading ? "Processing..." : `AutoCoin`}
     </Button>
   );
 }
