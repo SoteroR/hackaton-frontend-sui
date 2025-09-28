@@ -6,7 +6,7 @@ import CampaignList from "./components/campaign/CampaignList";
 export default function App() {
   return (
     <main className="p-6">
-      <h1 className="text-2xl font-bold">Crowdfunding dApp</h1>
+      <h1 className="text-2xl font-bold">CROWDFUNDING</h1>
     </main>
   );
 }

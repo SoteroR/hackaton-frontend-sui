@@ -23,12 +23,7 @@ const components: { title: string; href: string; description: string }[] = [
     title: "My Campaigns",
     href: "/my-campaigns",
     description: "View campaigns you created with your wallet.",
-  },
-  {
-    title: "All Campaigns",
-    href: "/campaigns",
-    description: "Browse and contribute to all active campaigns.",
-  },
+  }
 ];
 
 export default function Navbar() {
