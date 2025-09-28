@@ -29,6 +29,8 @@ export async function fetchAllCampaigns(): Promise<Campaign[]> {
     const campaigns: Campaign[] = [];
     for (const evt of response.data) {
       const fields = evt.parsedJson;
+
+      // @ts-ignore
       const id = fields.campaign_id as string;
 
       const obj = await client.getObject({
@@ -43,8 +45,11 @@ export async function fetchAllCampaigns(): Promise<Campaign[]> {
 
       campaigns.push({
         id,
+        // @ts-ignore
         goal: Number(objFields.goal ?? fields.goal ?? 0),
+        // @ts-ignore
         deadline: Number(objFields.deadline ?? fields.deadline ?? 0),
+        // @ts-ignore
         owner: objFields.owner ?? fields.owner ?? "",
         totalRaised: Number(objFields.total_raised ?? 0),
         isActive: objFields.is_active ?? true,
