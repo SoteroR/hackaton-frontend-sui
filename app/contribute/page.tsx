@@ -1,5 +1,5 @@
 "use client";
-
+import { Suspense } from "react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Transaction } from "@mysten/sui/transactions";
@@ -59,6 +59,7 @@ export default function ContributePage() {
   };
 
   return (
+    <Suspense fallback={<div>Loading…</div>}>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
       <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
         <h1 className="text-2xl font-bold mb-4 text-gray-900">
@@ -108,5 +109,6 @@ export default function ContributePage() {
         </div>
       )}
     </div>
+    </Suspense>
   );
 }
