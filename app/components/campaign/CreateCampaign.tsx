@@ -12,10 +12,11 @@ export default function CreateCampaign() {
   const [deadline, setDeadline] = useState(""); // datetime-local
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [nftUrl, setNftUrl] = useState(""); // nuevo campo opcional
 
   const handleCreate = async () => {
     if (!goal || !deadline || !name || !description) {
-      alert("Please fill in all fields");
+      alert("⚠️ Please fill in all required fields (Goal, Deadline, Name, Description)");
       return;
     }
 
@@ -31,14 +32,22 @@ export default function CreateCampaign() {
         return;
       }
 
+      // Procesar URL (si existe)
+      let urlBytes: number[] = [];
+      if (nftUrl.trim().length > 0) {
+        const encoder = new TextEncoder();
+        urlBytes = Array.from(encoder.encode(nftUrl));
+      }
+
       tx.moveCall({
         target: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::create_campaign`,
         arguments: [
           tx.pure.u64(goal),             // 🎯 goal
-          tx.pure.u64(durationMs),       // ⏳ duration en milisegundos
+          tx.pure.u64(durationMs),       // ⏳ duración en milisegundos
           tx.pure.string(name),          // 📝 name
           tx.pure.string(description),   // 📝 description
-          tx.object("0x6"),              // ⏰ Clock object fijo
+          tx.pure.vector("u8", urlBytes),// 🖼️ nft_url_bytes (vacío = usa la URL por defecto)
+          tx.object("0x6"),              // ⏰ Clock
         ],
       });
 
@@ -124,6 +133,23 @@ export default function CreateCampaign() {
               rows={4}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg bg-white text-gray-900"
             />
+          </div>
+
+          {/* NFT URL (opcional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              NFT Image URL (optional)
+            </label>
+            <input
+              type="text"
+              value={nftUrl}
+              onChange={(e) => setNftUrl(e.target.value)}
+              placeholder="https://example.com/my-nft.png"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-lg bg-white text-gray-900"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              If left empty, a default NFT image will be used.
+            </p>
           </div>
 
           {/* Button */}

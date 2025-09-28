@@ -5,7 +5,12 @@ import { TESTNET_COUNTER_PACKAGE_ID } from "../constants";
 
 const client = new SuiClient({ url: getFullnodeUrl("testnet") });
 
-// Define a type for campaigns
+export interface Contribution {
+  contributor: string;
+  amount: number;
+  refunded: boolean;
+}
+
 export interface Campaign {
   id: string;
   goal: number;
@@ -16,19 +21,23 @@ export interface Campaign {
   isActive: boolean;
   name: string;
   description: string;
+  contributions: Contribution[];
   canClaim?: boolean;
   canRefund?: boolean;
   canRequestRefund?: boolean;
 }
 
-// Inside fetchUserCampaigns
 export async function fetchUserCampaigns(userAddress: string) {
   try {
+    console.log("👤 Fetching campaigns for:", userAddress);
+
     const response = await client.queryEvents({
       query: {
         MoveEventType: `${TESTNET_COUNTER_PACKAGE_ID}::crowdfunding_app::CampaignCreated`,
       },
     });
+
+    console.log("📦 Events found:", response.data.length);
 
     const campaigns: Campaign[] = await Promise.all(
       response.data.map(async (evt: any) => {
@@ -45,6 +54,14 @@ export async function fetchUserCampaigns(userAddress: string) {
           objFields = (obj.data.content as any).fields;
         }
 
+        // 🔹 Contributions pueden venir como vector
+        const contributions: Contribution[] =
+          objFields.contributions?.map((c: any) => ({
+            contributor: c.fields.contributor,
+            amount: Number(c.fields.amount),
+            refunded: c.fields.refunded,
+          })) || [];
+
         const campaign: Campaign = {
           id,
           goal: Number(objFields.goal ?? 0),
@@ -55,7 +72,15 @@ export async function fetchUserCampaigns(userAddress: string) {
           isActive: objFields.is_active ?? true,
           name: objFields.name || "Untitled Campaign",
           description: objFields.description || "No description provided.",
+          contributions,
         };
+
+        console.log("📝 Campaign loaded:", {
+          id: campaign.id,
+          owner: campaign.owner,
+          totalRaised: campaign.totalRaised,
+          contributions: campaign.contributions.length,
+        });
 
         return {
           ...campaign,
@@ -74,13 +99,22 @@ export async function fetchUserCampaigns(userAddress: string) {
     );
 
     // classify
-    const adminCampaigns: Campaign[] = campaigns.filter(
-      (c) => c.admin === userAddress
+    const adminCampaigns = campaigns.filter((c) => c.admin === userAddress);
+    const ownerCampaigns = campaigns.filter((c) => c.owner === userAddress);
+
+    // 🔹 ahora buscamos contribuidor
+    const contributorCampaigns = campaigns.filter((c) =>
+      c.contributions.some(
+        (contrib) =>
+          contrib.contributor.toLowerCase() === userAddress.toLowerCase()
+      )
     );
-    const ownerCampaigns: Campaign[] = campaigns.filter(
-      (c) => c.owner === userAddress
-    );
-    const contributorCampaigns: Campaign[] = []; // later will be filled
+
+    console.log("✅ Classification done:", {
+      admins: adminCampaigns.length,
+      owners: ownerCampaigns.length,
+      contributors: contributorCampaigns.length,
+    });
 
     return { adminCampaigns, ownerCampaigns, contributorCampaigns };
   } catch (err) {
