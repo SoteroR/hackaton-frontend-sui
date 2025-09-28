@@ -2,7 +2,7 @@ name: "Deploy to GitHub Pages"
 
 on:
   push:
-    branches: [ main ]  # or master if that's your default
+    branches: [ main ]  # or master if that's your default branch
 
 jobs:
   deploy:
@@ -15,15 +15,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18"
+          cache: "pnpm"   # enable automatic cache
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8      # or the version you use in the project
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist   # Change if your build output differs
+          publish_dir: ./dist   # change if your build output folder is different
