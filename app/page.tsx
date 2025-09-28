@@ -25,7 +25,7 @@ export default function Home() {
           <div className="p-6 bg-white rounded-xl shadow-md border border-gray-200">
             <h3 className="text-xl font-bold mb-2 text-gray-900">💸 Fair</h3>
             <p className="text-sm text-gray-800">
-              Only 2% platform fee vs the usual 5–10%.
+              Only 2% platform fee when funding goal is reached.
             </p>
           </div>
           <div className="p-6 bg-white rounded-xl shadow-md border border-gray-200">

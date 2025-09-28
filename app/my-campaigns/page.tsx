@@ -124,7 +124,13 @@ export default function MyCampaignsPage() {
     );
 
     return (
-      <div className="p-5 border rounded-xl mb-6 bg-white shadow-md text-gray-900">
+      <div
+        className={`p-5 border rounded-xl mb-6 shadow-md text-gray-900
+          ${role === "admin" ? "bg-yellow-50" : ""}
+          ${role === "owner" ? "bg-green-50" : ""}
+          ${role === "contributor" ? "bg-blue-50" : ""}
+        `}
+      >
         <h3 className="font-bold text-xl mb-1">
           {c.name || "Untitled Campaign"}
         </h3>
